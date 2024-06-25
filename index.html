@@ -1,24 +1,39 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Generador de Apps con Firebase</title>
-        <link rel="stylesheet" type="text/css" href="styles.css">
-    </head>
-    <body>
-        <h1>Generador de Apps con Firebase</h1>
+<head>
+  <title>Generador de Apps con Firebase</title>
+  <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
+    <h1>Generador de Apps con Firebase</h1>
+    <div class="container">
+    
         <form id="configForm">
-            <h2>Configuración de Firebase</h2>
-            <textarea id="firebaseConfig" placeholder="Pega aquí el FIREBASE CONFIG" required></textarea>
-            <h2>Detalles del Formulario</h2>
-            <input type="text" id="activityName" placeholder="Nombre de la actividad (e.g., Lista de Alumnos)" required>
-            <input type="number" id="fieldCount" placeholder="Número de campos en el formulario" required min="1">
-            <div id="fieldsContainer"></div>
-            <button type="submit">Generar Código</button>
+            <div class="box">
+                <h2>API Key de OpenAI</h2>
+                <input type="text" id="openaiApiKey" placeholder="Introduce tu API Key de OpenAI" required>
+                <small class="alert">Por favor, asegúrate de mantener tu API Key privada y no compartirla públicamente.</small>
+            </div>
+            <div class="box">
+                <h2>Configuración de Firebase</h2>
+                <textarea id="firebaseConfig" placeholder="Pega aquí el FIREBASE CONFIG" required></textarea>
+                <small class="alert">Por favor, asegúrate de mantener tu Configuración de proyecto FireBase privada y no compartirla públicamente.</small>
+            </div>
+            <div class="box">
+                <h2>Detalles de la App</h2>
+                <input type="text" id="activityName" placeholder="Nombre de la actividad (e.g., Lista de Alumnos)" required>
+                <input type="number" id="fieldCount" placeholder="Número de campos en el formulario" required min="1">
+                <div id="fieldsContainer"></div>
+                <textarea id="appDescription" placeholder="Descripción de la App, indica brevemente en que consiste" required></textarea>
+                <small class="alert">Principalmente indica nombres de los campos, y elementos de interacción entre el usuario y la aplicación.</small>
+            </div>
+        <button type="submit">Generar Código</button>
         </form>
 
         <h2>Output HTML</h2>
         <textarea id="outputHTML" readonly rows="20"></textarea>
+    </div>
 
-        <script src="script.js"></script>
-    </body>
+  <script src="script.js"></script>
+</body>
 </html>

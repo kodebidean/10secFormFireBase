@@ -1,4 +1,4 @@
-document.getElementById("configForm").addEventListener("submit", function(event) {
+document.getElementById("configForm").addEventListener("submit", async function(event) {
     event.preventDefault();
   
     const firebaseConfig = document.getElementById("firebaseConfig").value;
@@ -6,9 +6,20 @@ document.getElementById("configForm").addEventListener("submit", function(event)
     const fieldCount = parseInt(document.getElementById("fieldCount").value);
     const fieldsContainer = document.getElementById("fieldsContainer");
     const fieldNames = Array.from(fieldsContainer.getElementsByTagName('input')).map(input => input.value);
+    const appDescription = document.getElementById("appDescription").value;
+    const openaiApiKey = document.getElementById("openaiApiKey").value.trim(); // Utiliza la API key proporcionada por el usuario
   
-    const outputHTML = generateHTML(firebaseConfig, activityName, fieldNames);
+    // Validación de la API Key
+    if (!openaiApiKey) {
+      alert("Por favor, ingresa tu API Key de OpenAI.");
+      return;
+    }
+  
+    // Lógica para generar el código HTML
+    const outputHTML = await generateHTML(firebaseConfig, activityName, fieldNames, appDescription, openaiApiKey);
     document.getElementById("outputHTML").value = outputHTML;
+  
+    alert("Código generado con éxito.");
   });
   
   document.getElementById("fieldCount").addEventListener("input", function() {
@@ -25,105 +36,34 @@ document.getElementById("configForm").addEventListener("submit", function(event)
     }
   });
   
-  function generateHTML(firebaseConfig, activityName, fieldNames) {
-    const firebaseConfigString = firebaseConfig.split('\n').join('\n      ');
+  async function generateHTML(firebaseConfig, activityName, fieldNames, appDescription, openaiApiKey) {
+    const prompt = `
+      Genera el código HTML, CSS y JavaScript para una aplicación web que utiliza Firebase para ${activityName}.
+      La configuración de Firebase es la siguiente:
+      ${firebaseConfig}
+      El formulario debe contener los siguientes campos: ${fieldNames.join(', ')}.
+      Descripción de la funcionalidad y elementos de la app:
+      ${appDescription}
   
-    const formFields = fieldNames.map(fieldName => 
-      `<input type="text" id="${fieldName}" placeholder="${fieldName}" required>`).join('\n    ');
+      El código HTML debe estar en una estructura separada en tres archivos: index.html, styles.css y script.js.
+    `;
   
-    const addFieldAssignments = fieldNames.map(fieldName => 
-      `${fieldName}: document.getElementById("${fieldName}").value`).join(', ');
+    const response = await callOpenAIAPI(prompt, openaiApiKey);
+    return response.choices[0].text.trim();
+  }
   
-    const displayFields = fieldNames.map(fieldName => 
-      `<span>\${item.${fieldName}}</span>`).join(' ');
-  
-    return `<!DOCTYPE html>
-  <html>
-  <head>
-    <title>${activityName}</title>
-    <link rel="stylesheet" type="text/css" href="styles.css">
-    <!-- Import Firebase libraries from CDN -->
-    <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.10.0/firebase-firestore-compat.js"></script>
-  </head>
-  <body>
-    <h1>${activityName}</h1>
-    <form id="itemForm">
-      ${formFields}
-      <button type="submit">Añadir ${activityName}</button>
-    </form>
-  
-    <div id="itemsContainer"></div>
-  
-    <script>
-      // Configuración de Firebase
-      const firebaseConfig = {
-        ${firebaseConfigString}
-      };
-  
-      // Inicializar Firebase
-      firebase.initializeApp(firebaseConfig);
-      const db = firebase.firestore();
-  
-      // Función para añadir item
-      function addItem(${fieldNames.join(', ')}) {
-        db.collection("${activityName.toLowerCase()}").add({
-          ${addFieldAssignments}
-        })
-        .then((docRef) => {
-          console.log("Document written with ID: ", docRef.id);
-          getItems();  // Actualizar lista de items
-        })
-        .catch((error) => {
-          console.error("Error adding document: ", error);
-        });
-      }
-  
-      // Función para obtener y mostrar items
-      function getItems() {
-        db.collection("${activityName.toLowerCase()}").get().then((querySnapshot) => {
-          const itemsContainer = document.getElementById("itemsContainer");
-          itemsContainer.innerHTML = "";
-          querySnapshot.forEach((doc) => {
-            const item = doc.data();
-            const itemDiv = document.createElement("div");
-            itemDiv.className = "item";
-            itemDiv.innerHTML = \`
-              ${displayFields}
-              <div>
-                <button onclick="deleteItem('\${doc.id}')">Eliminar</button>
-              </div>
-            \`;
-            itemsContainer.appendChild(itemDiv);
-          });
-        });
-      }
-  
-      // Función para eliminar item
-      function deleteItem(id) {
-        db.collection("${activityName.toLowerCase()}").doc(id).delete().then(() => {
-          console.log("Document successfully deleted!");
-          getItems();  // Actualizar lista de items
-        }).catch((error) => {
-          console.error("Error removing document: ", error);
-        });
-      }
-  
-      // Manejar el envío del formulario
-      document.getElementById("itemForm").addEventListener("submit", function(event) {
-        event.preventDefault();
-        ${fieldNames.map(fieldName => `let ${fieldName} = document.getElementById("${fieldName}").value;`).join('\n      ')}
-        if(${fieldNames.map(fieldName => fieldName).join(' && ')}) {
-          addItem(${fieldNames.join(', ')});
-        } else {
-          alert("Todos los campos son obligatorios.");
-        }
-      });
-  
-      // Obtener y mostrar items al cargar la página
-      window.onload = getItems;
-    </script>
-  </body>
-  </html>`;
+  async function callOpenAIAPI(prompt, apiKey) {
+    const response = await fetch('https://api.openai.com/v1/engines/text-davinci-003/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        prompt: prompt,
+        max_tokens: 2000
+      })
+    });
+    return await response.json();
   }
   

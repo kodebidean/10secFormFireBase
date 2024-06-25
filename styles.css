@@ -1,16 +1,100 @@
 body {
-    font-family: Arial, sans-serif;
-    margin: 20px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction:column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+  
+  .container {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 800px;
+    box-sizing: border-box;
+    margin-top: 20px;
+  }
+  
+  h1 {
+    display: block;
+    color: #dbb435ec;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  h2 {
+    color: rgba(9, 20, 75, 0.982);
+    margin-bottom: 20px;
+    text-align: center;
   }
   
   form {
-    margin-bottom: 20px;
+    margin-bottom: 30px;
+  }
+
+  .box {
+    border-radius:1em;
+    padding: 4px 24px;
+    margin: 12px 10px;
+    border: 2px solid rgba(128, 128, 128, 0.642);
+    background-color: #33333397;
   }
   
+
+
   textarea, input, button {
-    margin: 5px;
-    padding: 10px;
-    font-size: 16px;
     width: 100%;
+    margin-bottom: 10px;
+    padding: 15px;
+    font-size: 16px;
+    border: 1px solid #dddddd;
+    border-radius: 8px;
+    box-sizing: border-box;
+  }
+
+
+  
+  textarea {
+    resize: vertical;
+    height: 100px;
+  }
+  
+  button {
+    background: #007BFF;
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  
+  button:hover {
+    background: #0056b3;
+  }
+  
+.alert {
+    display: block;
+    margin-bottom:12px;   
+}
+
+  #outputHTML {
+    resize: vertical;
+    height: 300px;
+  }
+  
+  @media (max-width: 600px) {
+    .container {
+      padding: 20px;
+    }
+  
+    textarea, input, button {
+      font-size: 14px;
+      padding: 10px;
+    }
   }
   
